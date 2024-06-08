@@ -1,27 +1,35 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { useState } from "react";
+import { TextField, Button, Box } from "@mui/material";
 
 const MessageInput = ({ sendMessage }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleInputChange = (event) => {
     setMessage(event.target.value);
   };
 
   const handleSendMessage = () => {
-    if (message.trim() !== '') {
+    if (message.trim() !== "") {
       const newMessage = {
-        user: 'Guest',
+        user: "Guest",
         text: message.trim(),
       };
       sendMessage(newMessage);
-      setMessage('');
+      setMessage("");
     }
   };
 
   return (
-    <Box sx={{ position: 'fixed', bottom: 0, width: '100%', padding: 2, backgroundColor: '#ffffff' }}>
-      <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        width: "100%",
+        padding: 2,
+        backgroundColor: "#ffffff",
+      }}
+    >
+      <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
         <TextField
           variant="outlined"
           fullWidth

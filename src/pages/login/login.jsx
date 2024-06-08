@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import { database, ref, set, get } from '../../lib/firebase'; // Asegúrate de importar `get` desde Firebase
 
 const Login = () => {
   const [user, setUser] = useState('');
@@ -10,10 +11,23 @@ const Login = () => {
     setUser(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (user) {
-      navigate('/chat', { state: { user } });
+      try {
+        const dbRef = ref(database, 'users/' + user);
+        const snapshot = await get(dbRef); // Utiliza `get` para obtener el snapshot de la referencia
+        if (snapshot.exists()) {
+          console.log('User already exists');
+        } else {
+          await set(dbRef, {
+            username: user
+          });
+          navigate('/chat', { state: { user } });
+        }
+      } catch (error) {
+        console.error('Error logging in:', error);
+      }
     }
   };
 
@@ -28,7 +42,7 @@ const Login = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Login
+          Inicio de sesión
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
@@ -36,7 +50,7 @@ const Login = () => {
             required
             fullWidth
             id="user"
-            label="Username"
+            label="Nombre de usuario"
             name="user"
             autoComplete="user"
             autoFocus
@@ -44,7 +58,7 @@ const Login = () => {
             onChange={handleInputChange}
           />
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-            Login
+            Ingresar
           </Button>
         </Box>
       </Box>

@@ -1,0 +1,18 @@
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, get, onValue } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: "chat-sdh-react.firebaseapp.com",
+  databaseURL: "https://chat-sdh-react-default-rtdb.firebaseio.com",
+  projectId: "chat-sdh-react",
+  storageBucket: "chat-sdh-react.appspot.com",
+  messagingSenderId: "987498289010",
+  appId: "1:987498289010:web:742753347710d7d0fd2feb",
+  measurementId: "G-VB30HD6HT2",
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+export { database, ref, set, get, onValue };
