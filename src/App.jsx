@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './pages/login/login';
-import Chat from './pages/chat/chat';
-import { AppBar, Toolbar, Typography, Container } from '@mui/material';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./pages/login/login";
+import Chat from "./pages/chat/chat";
+import { AppBar, Toolbar, Typography, Container } from "@mui/material";
 
 const App = () => {
   return (
