@@ -36,6 +36,8 @@ const Chat = () => {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [image, setImage] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState({});
+  const [usersWithUnreadMessages, setUsersWithUnreadMessages] = useState([]);
 
   const messagesEndRef = useRef(null);
 
@@ -48,11 +50,19 @@ const Chat = () => {
     onValue(usersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const usersArray = Object.keys(data).map((key) => data[key].username);
+        const usersArray = Object.keys(data)
+          .map((key) => data[key].username)
+          .filter((username) => username !== currentUser);
         setConnectedUsers(usersArray);
+        setUnreadMessages(
+          usersArray.reduce((acc, username) => {
+            acc[username] = 0;
+            return acc;
+          }, {})
+        );
       }
     });
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     scrollToBottom();
@@ -74,7 +84,8 @@ const Chat = () => {
       (message.trim() !== "" || image)
     ) {
       const newMessage = {
-        user: currentUser,
+        sender: currentUser,
+        receiver: selectedUser,
         text: message.trim(),
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
@@ -95,12 +106,26 @@ const Chat = () => {
 
       setMessages([...messages, newMessage]);
       setMessage("");
+
+      if (selectedUser) {
+        setUnreadMessages((prevUnread) => ({
+          ...prevUnread,
+          [selectedUser]: (prevUnread[selectedUser] || 0) + 1,
+        }));
+      }
     }
   };
 
   const handleUserSelect = (username) => {
     setSelectedUser(username === currentUser ? null : username);
     setMessage("");
+
+    if (username) {
+      setUnreadMessages((prevUnread) => ({
+        ...prevUnread,
+        [username]: 0,
+      }));
+    }
   };
 
   useEffect(() => {
@@ -109,21 +134,41 @@ const Chat = () => {
       const data = snapshot.val();
       if (data) {
         const messagesArray = Object.keys(data).map((key) => data[key]);
-        setMessages(messagesArray);
+        const filteredMessages = messagesArray.filter(
+          (msg) =>
+            (msg.sender === currentUser && msg.receiver === selectedUser) ||
+            (msg.sender === selectedUser && msg.receiver === currentUser)
+        );
+        setMessages(filteredMessages);
       }
     });
-  }, []);
+  }, [selectedUser, currentUser]);
+
+  useEffect(() => {
+    const unreadUsers = Object.keys(unreadMessages).filter(
+      (username) => unreadMessages[username] > 0
+    );
+    setUsersWithUnreadMessages(unreadUsers);
+  }, [unreadMessages]);
 
   return (
     <Container
       component="main"
       maxWidth="lg"
-      sx={{ height: "90vh", display: "flex", flexDirection: "column" }}
+      sx={{ height: "85vh", display: "flex", flexDirection: "column" }}
     >
-      <Box sx={{ flex: 1, display: "flex", marginTop: 8 }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          marginTop: 5,
+          overflow: "hidden",
+        }}
+      >
         <ConnectedUsers
           users={connectedUsers}
           onUserSelect={handleUserSelect}
+          messageCounts={unreadMessages}
         />
         <Box
           sx={{
@@ -133,6 +178,7 @@ const Chat = () => {
             alignItems: "center",
             paddingLeft: 3,
             height: "100%",
+            overflowY: "auto",
           }}
         >
           <Typography component="h1" variant="h5">
@@ -144,7 +190,7 @@ const Chat = () => {
             </Typography>
           )}
           {selectedUser && (
-            <Box sx={{ marginTop: 0}}>
+            <Box>
               <Typography variant="h7" sx={{ color: "#1976D2" }}>
                 Chat con {selectedUser}
               </Typography>
@@ -165,7 +211,7 @@ const Chat = () => {
               {messages.map((msg, index) => (
                 <ListItem key={index} alignItems="flex-start">
                   <ListItemText
-                    primary={`${msg.user} (${msg.timestamp})`}
+                    primary={`${msg.sender} (${msg.timestamp})`}
                     secondary={
                       <>
                         {msg.text}
@@ -183,7 +229,7 @@ const Chat = () => {
                       </>
                     }
                     sx={{
-                      textAlign: msg.user === currentUser ? "right" : "left",
+                      textAlign: msg.sender === currentUser ? "right" : "left",
                     }}
                   />
                 </ListItem>
@@ -198,7 +244,8 @@ const Chat = () => {
               display: "flex",
               alignItems: "center",
               marginTop: 2,
-              gap: 1,
+              gap: 3,
+              marginBottom: 2,
             }}
           >
             <TextField
@@ -222,7 +269,10 @@ const Chat = () => {
               sx={{ display: "none" }}
               id="upload-image"
             />
-            <InputLabel htmlFor="upload-image" sx={{display: "flex", justifyContent: "center"}}>
+            <InputLabel
+              htmlFor="upload-image"
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <IconButton component="span">
                 <PhotoIcon />
               </IconButton>

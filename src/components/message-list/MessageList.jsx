@@ -7,7 +7,7 @@ const MessageList = ({ messages, currentUser }) => {
         flexGrow: 1,
         overflowY: "auto",
         maxHeight: "calc(100vh - 160px)",
-        padding: "0 16px", //
+        padding: "0 16px",
       }}
     >
       <List>
