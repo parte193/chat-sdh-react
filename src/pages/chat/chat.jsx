@@ -107,7 +107,6 @@ const Chat = () => {
       setMessages([...messages, newMessage]);
       setMessage("");
 
-
       if (selectedUser) {
         setUnreadMessages((prevUnread) => ({
           ...prevUnread,
@@ -270,7 +269,10 @@ const Chat = () => {
               sx={{ display: "none" }}
               id="upload-image"
             />
-            <InputLabel htmlFor="upload-image" sx={{ display: "flex", justifyContent: "center" }}>
+            <InputLabel
+              htmlFor="upload-image"
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <IconButton component="span">
                 <PhotoIcon />
               </IconButton>

@@ -54,12 +54,16 @@ const ConnectedUsers = ({ users, onUserSelect, messageCounts }) => {
             onClick={() => handleClick(user)}
             selected={user === messageCounts[user]}
             sx={{
-              backgroundColor: user === messageCounts[user] ? "#1976D2" : "transparent",
+              backgroundColor:
+                user === messageCounts[user] ? "#1976D2" : "transparent",
               color: user === messageCounts[user] ? "black" : "#1976D2",
               borderRadius: 10,
               marginBottom: 1,
               "&:hover": {
-                backgroundColor: user === messageCounts[user] ? "#1976D2" : "rgba(0, 0, 0, 0.2)",
+                backgroundColor:
+                  user === messageCounts[user]
+                    ? "#1976D2"
+                    : "rgba(0, 0, 0, 0.2)",
               },
             }}
           >
